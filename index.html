@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <style>
+      .barchart { padding: 10px; background: #f0f0c0; }
+      .bar { fill: #6aba6a; }
+      #b2 .bar:nth-child(2n) { fill: #4a8a4a; }
+    </style>
+  </head>
+  <body>
+    <div id="b1"></div>
+    <div id="b2"></div>
+    <div id="b3"></div>
+    <script src="d3.v3.min.js"></script>
+    <script src="helper.js"></script>
+    <script>
+      var data = [
+        { key: 'A', value: 15 },
+        { key: 'B', value: 45 },
+        { key: 'C', value: 30 },
+        { key: 'D', value: 20 }
+      ];
+      
+      helper
+        .target('#b1')
+        .width(300)
+        .height(200)
+        .data(data)
+        .chart('bar');
+      
+      helper
+        .target('#b2')
+        .width(300)
+        .height(200)
+        .data(data)
+        .scale('y', 0, 50)
+        .chart('bar');
+      
+      helper
+        .target('#b3')
+        .width(300)
+        .height(200)
+        .data(data)
+        //.label()
+        .chart('bar');
+    </script>
+  </body>
+</html>
