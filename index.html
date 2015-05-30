@@ -2,7 +2,7 @@
   <head>
     <style>
       div { margin: .1em 0; display: inline-block; border: 1px solid #4a8a4a; }
-      .barchart { padding: 10px; background: #f0f0c0; }
+      .barchart { background: #f0f0c0; }
       .bar { fill: #5aaa5a; }
       .bar:nth-child(2n) { fill: #4a8a4a; }
       .label { font-family: sans-serif; }
@@ -13,10 +13,13 @@
     <div id="b1"></div>
     <div id="b2"></div>
     <div id="b3"></div>
+    <div id="b4"></div>
+    <div id="b5"></div>
     <script src="d3.v3.min.js"></script>
     <script src="helper.js"></script>
     <script>
       
+      // The data to visualise
       var data = [
         { key: 'Ana', value: 15 },
         { key: 'Boško', value: 45 },
@@ -24,22 +27,42 @@
         { key: 'Dora', value: 20 }
       ];
       
+      // Pass the data, graph width, graph height to helper
       helper.data(data).width(300).height(300);
       
+      // Draw bar chart of passed data to #b1 div
       helper
         .target('#b1')
         .chart('bar');
       
+      // Let's scale our data along the y-axis and add labels
+      helper
+        .scale('y', 0, 50)
+        .label('key', 'inside-bottom')
+        .label('value', 'outside');
+      
+      // Draw the scaled bar chart to #b2. Explicitly define 'bottom' baseline
       helper
         .target('#b2')
-        .scale('y', 0, 50)
-        .chart('bar');
+        .chart('bar', 'bottom');
       
+      // Let's place the baseline at the top
       helper
         .target('#b3')
-        .label('key', 'inside-bottom')
-        .label('value', 'outside')
-        .chart('bar');
+        .chart('bar', 'top');
+      
+      // Scale the data along the x-axis so we can draw it on its side
+      helper.scale('x', 0, 50);
+      
+      // Baseline to the left
+      helper
+        .target('#b4')
+        .chart('bar', 'left');
+      
+      // Baseline to the right
+      helper
+        .target('#b5')
+        .chart('bar', 'right');
       
     </script>
   </body>
