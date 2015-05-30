@@ -8,7 +8,7 @@
   
   var _attributes = {},
       _scales     = {},
-      _labels     = {},
+      _labels     = [],
       _data       = undefined,
       _d3         = undefined;
   
@@ -33,16 +33,32 @@
           height: function adjustH(d, i) { return (_scales.y) ? _scales.y(d.value) : d.value; }
         });
     
-    if (_attributes.label) {
+    for (var i = 0; i < _labels.length; i++) {
       _d3.append('g')
         .selectAll('text')
         .data(_data).enter()
           .append('text')
-          .text(function setLabelText(d) { return d.key; })
+          .text(function setLabelText(d) { return d[_labels[i].dimension]; })
+          .attr('class', 'label ' + _labels[i].dimension)
           .attr('text-anchor', 'middle')
           .attr({
-            x: function adjustX(d, i) { return ((_attributes.width / _data.length) + 1 ) * i + ((_attributes.width / _data.length) / 2); },
-            y: function adjustY(d, i) { return _attributes.height - ((_scales.y) ? _scales.y(d.value) : d.value); }
+            x: function adjustX(d, j) { return ((_attributes.width / _data.length) + 1 ) * j + ((_attributes.width / _data.length) / 2); },
+            y: function adjustY(d, j) {
+              var locationOffset = (function() {
+                switch (_labels[i].location) {
+                  case 'inside-bottom':
+                    return 0;
+                  case 'inside-top':
+                    return 0;
+                  case 'outside':
+                    return (_scales.y) ? _scales.y(d.value) : d.value;
+                  default:
+                    return 0;
+                }
+              })();
+              
+              return _attributes.height - locationOffset - 5;
+            }
           });
     }
     
@@ -79,13 +95,13 @@
   };
   
   helper.scale = function scale(Axis, Minimum, Maximum) {
-    if (Axis == 'X' || Axis == 'x') {
+    if (Axis === 'X' || Axis === 'x') {
       _scales.x = (function() {
         return d3.scale.linear()
           .domain([Minimum, Maximum])
           .range([0, _attributes.width]);
       })();
-    } else if (Axis == 'Y' || Axis == 'y') {
+    } else if (Axis === 'Y' || Axis === 'y') {
       _scales.y = (function() {
         return d3.scale.linear()
           .domain([Minimum, Maximum])
@@ -98,8 +114,22 @@
     return this;
   };
   
-  helper.label = function label() {
-    _attributes.label = true;
+  helper.label = function label(Dimension, Location) {
+    if (Dimension === 'key' || Dimension === 'value') {
+      var labelObject = {
+        dimension : Dimension,
+        location  : Location || 'outside'
+      };
+      
+      if (_labels.indexOf(labelObject) == -1) {
+        _labels.push(labelObject);
+      }
+    } else if (Dimension === '' || typeof Dimension == 'undefined') {
+      _labels = [];
+    } else {
+      throw 'Undefined dimension.';
+    }
+    
     return this;
   };
   
