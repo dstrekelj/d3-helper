@@ -1,20 +1,33 @@
 <html>
   <head>
     <style>
-      div { margin: .1em 0; display: inline-block; border: 1px solid #4a8a4a; }
+      div { margin: .1em 0; display: inline-block; }
+      div[id^="b"] { border: 1px solid #4a8a4a; }
       .barchart { background: #f0f0c0; }
       .bar { fill: #5aaa5a; }
       .bar:nth-child(2n) { fill: #4a8a4a; }
       .label { font-family: sans-serif; }
       .label.key { fill: white; font-weight: bold; }
+      .arc:nth-child(1) { fill: darkgreen; }
+      .arc:nth-child(2) { fill: teal; }
+      .arc:nth-child(3) { fill: skyblue; }
+      .arc:nth-child(4) { fill: steelblue; }
     </style>
   </head>
   <body>
-    <div id="b1"></div>
-    <div id="b2"></div>
-    <div id="b3"></div>
-    <div id="b4"></div>
-    <div id="b5"></div>
+    <div>
+      <div id="b1"></div>
+      <div id="b2"></div>
+      <div id="b3"></div>
+      <div id="b4"></div>
+      <div id="b5"></div>
+    </div>
+    <div>
+      <div id="p1"></div>
+      <div id="p2"></div>
+      <div id="p3"></div>
+      <div id="p4"></div>
+    </div>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="helper.js"></script>
     <script>
@@ -31,38 +44,33 @@
       helper.data(data).width(300).height(300);
       
       // Draw bar chart of passed data to #b1 div
-      helper
-        .target('#b1')
-        .chart('bar');
+      helper.target('#b1').chart('bar');
       
       // Let's scale our data along the y-axis and add labels
-      helper
-        .scale('y', 0, 50)
-        .label('key', 'inside-bottom')
-        .label('value', 'outside');
+      helper.scale('y', 0, 50).label('key', 'inside-bottom').label('value', 'outside');
       
       // Draw the scaled bar chart to #b2. Explicitly define 'bottom' baseline
-      helper
-        .target('#b2')
-        .chart('bar', 'bottom');
+      helper.target('#b2').chart('bar', 'bottom');
       
       // Let's place the baseline at the top
-      helper
-        .target('#b3')
-        .chart('bar', 'top');
+      helper.target('#b3').chart('bar', 'top');
       
       // Scale the data along the x-axis so we can draw it on its side
       helper.scale('x', 0, 50);
       
       // Baseline to the left
-      helper
-        .target('#b4')
-        .chart('bar', 'left');
+      helper.target('#b4').chart('bar', 'left');
       
       // Baseline to the right
-      helper
-        .target('#b5')
-        .chart('bar', 'right');
+      helper.target('#b5').chart('bar', 'right');
+      
+      helper.target('#p1').chart('pie');
+      
+      helper.target('#p2').chart('ring');
+      
+      helper.target('#p3').outerRadius(120).chart('pie');
+      
+      helper.target('#p4').innerRadius(40).chart('ring');
       
     </script>
   </body>

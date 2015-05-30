@@ -9,6 +9,7 @@
   var _attributes = {},
       _scales     = {},
       _labels     = [],
+      _target     = 'body',
       _data       = undefined,
       _d3         = undefined;
   
@@ -42,7 +43,8 @@
       adjustY = 0;
     }
     
-    _d3 = d3.select(_attributes.target).append('svg')
+    _d3 = d3.select(_target)
+      .append('svg')
       .attr('class', 'barchart')
       .attr(_attributes);
     
@@ -143,20 +145,38 @@
   
   var _drawLineChart = function _drawLineChart() { };
   
-  var _drawPieChart = function _drawPieChart() { };
+  var _drawPieChart = function _drawPieChart(Ring) {
+    _attributes.innerRadius = _attributes.innerRadius || (Math.min(_attributes.width, _attributes.height) / 4);
+    _attributes.outerRadius = _attributes.outerRadius || (Math.min(_attributes.width, _attributes.height) / 2);
+    
+    var offset = Math.min(_attributes.width, _attributes.height) / 2;
+    
+    _d3 = d3.select(_target)
+      .append('svg')
+      .attr('class', Ring ? 'ringchart' : 'piechart')
+      .attr(_attributes);
+    
+    var arc = d3.svg.arc().outerRadius(_attributes.outerRadius).innerRadius((Ring ? _attributes.innerRadius : 0)),
+        pie = d3.layout.pie().value(function getValue(d) { return d.value; });
+    
+    var arcs = _d3.selectAll('g.arc')
+      .data(pie(_data))
+      .enter()
+      .append('g')
+      .attr('class', 'arc')
+      .attr('transform', 'translate(' + offset + ',' + offset + ')');
+    
+    arcs.append('path')
+      .attr('d', arc);
+  };
   
   helper.attr = function setAttr(Attributes) {
     _attributes = Attributes;
     return this;
   };
   
-  helper.target = function setTarget(Target) {
-    _attributes.target = Target;
-    return this;
-  };
-  
-  helper.width = function setWidth(Width) {
-    _attributes.width = Width;
+  helper.data = function setData(Data) {
+    _data = Data;
     return this;
   };
   
@@ -165,8 +185,23 @@
     return this;
   };
   
-  helper.data = function setData(Data) {
-    _data = Data;
+  helper.innerRadius = function setInnerRadius(InnerRadius) {
+    _attributes.innerRadius = InnerRadius;
+    return this;
+  };
+  
+  helper.outerRadius = function setOuterRadius(OuterRadius) {
+    _attributes.outerRadius = OuterRadius;
+    return this;
+  };
+  
+  helper.target = function setTarget(Target) {
+    _target = Target;
+    return this;
+  };
+  
+  helper.width = function setWidth(Width) {
+    _attributes.width = Width;
     return this;
   };
   
@@ -214,6 +249,7 @@
       case 'bar'  : _drawBarChart(Baseline);  break;
       case 'line' : _drawLineChart();         break;
       case 'pie'  : _drawPieChart();          break;
+      case 'ring' : _drawPieChart(true);      break;
       default     : throw 'Undefined chart type.';
     }
     
