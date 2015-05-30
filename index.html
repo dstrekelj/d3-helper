@@ -3,7 +3,7 @@
     <style>
       .barchart { padding: 10px; background: #f0f0c0; }
       .bar { fill: #6aba6a; }
-      #b2 .bar:nth-child(2n) { fill: #4a8a4a; }
+      .bar:nth-child(2n) { fill: #4a8a4a; }
     </style>
   </head>
   <body>
@@ -20,28 +20,13 @@
         { key: 'D', value: 20 }
       ];
       
-      helper
-        .target('#b1')
-        .width(300)
-        .height(200)
-        .data(data)
-        .chart('bar');
+      helper.data(data).width(300).height(200);
       
-      helper
-        .target('#b2')
-        .width(300)
-        .height(200)
-        .data(data)
-        .scale('y', 0, 50)
-        .chart('bar');
+      helper.target('#b1').chart('bar');
       
-      helper
-        .target('#b3')
-        .width(300)
-        .height(200)
-        .data(data)
-        //.label()
-        .chart('bar');
+      helper.target('#b2').scale('y', 0, 50).chart('bar');
+      
+      helper.target('#b3').label().chart('bar');
     </script>
   </body>
 </html>
