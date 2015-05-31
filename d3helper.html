@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <div id="pie"></div>
+  <script src="d3.v3.min.js"></script>
+  <script src="d3-helper.js"></script>
+  <script>
+    
+    var data1 = [
+      { key: 'A', value: 80 },
+      { key: 'B', value: 30 },
+      { key: 'C', value: 60 },
+      { key: 'D', value: 20 }
+    ];
+    
+    var pie = d3helper.chart('pie')
+      .height(300).width(300)
+      .data(data1)
+      .target('#pie')
+      .draw();
+    
+  </script>
+</body>
+</html>

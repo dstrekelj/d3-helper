@@ -164,10 +164,23 @@
       .enter()
       .append('g')
       .attr('class', 'arc')
-      .attr('transform', 'translate(' + offset + ',' + offset + ')');
-    
-    arcs.append('path')
+      .attr('transform', 'translate(' + offset + ',' + offset + ')')
+      .append('path')
       .attr('d', arc);
+    
+    for (var i = 0; i < _labels.length; i++) {
+      var textAnchor        = 'middle',
+          alignmentBaseline = 'alphabetic';
+      
+      var adjustLabelXY = function adjustLabelXY(d) { return 'translate(' + arc.centroid(d.value) + ')'; };
+      
+      arcs.append("text")
+        .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+        .attr("text-anchor", "middle")
+        .text(function(d) { console.log(d.value); });
+    }
+    
+    return this;
   };
   
   helper.attr = function setAttr(Attributes) {
