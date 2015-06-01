@@ -139,12 +139,17 @@
   function BarChart() {
     var that = Chart();
     
-    var _barHeight,
+    var _alignmentBaseline,
+        _barHeight,
         _barWidth,
         _barX,
         _barY,
         _baseline = 'bottom',
-        _scales = { c: that.colorScale(), x: that.xScale(), y: that.yScale() };
+        _labels = [],
+        _labelX,
+        _labelY,
+        _scales = { c: that.colorScale(), x: that.xScale(), y: that.yScale() },
+        _textAnchor;
     
     var updateVariables = function() {
       _scales.c = that.colorScale();
@@ -156,7 +161,6 @@
           case 'bottom':
           case 'top':
             return function(d, i) { return _scales.y ? _scales.y(d.value) : d.value; };
-            break;
           default:
             return that.height() / that.data().length;
         }
@@ -167,7 +171,6 @@
           case 'left':
           case 'right':
             return function(d, i) { return _scales.x ? _scales.x(d.value) : d.value; };
-            break;
           default:
             return that.width() / that.data().length;
         }
@@ -178,10 +181,8 @@
           case 'bottom':
           case 'top':
             return function(d, i) { return that.width() / that.data().length * i; };
-            break;
           case 'right':
             return function(d, i) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value); };
-            break;
           case 'left':
           default:
             return 0;
@@ -193,15 +194,78 @@
           case 'left':
           case 'right':
             return function(d, i) { return that.height() / that.data().length * i; };
-            break;
           case 'bottom':
             return function(d, i) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value); };
-            break;
           case 'top':
           default:
             return 0;
         }
-      })();      
+      })();
+    };
+    
+    var updateLabelVariables = function(Label) {
+      _alignmentBaseline = 'alphabetic';
+      _textAnchor = 'middle';
+      
+      _labelX = (function() {
+        switch (_baseline) {
+          case 'bottom':
+          case 'top':
+            return function(d, j) { return that.width() / that.data().length * (j + 1/2); };
+          case 'left':
+            _textAnchor = 'start';
+            switch (Label.location) {
+              case 'inside-bottom':
+                return 0;
+              case 'outside':
+                return function(d, j) { return _scales.x ? _scales.x(d.value) : d.value; };
+              default:
+                return 0;
+            }
+          case 'right':
+            _textAnchor = 'end';
+            switch (Label.location) {
+              case 'inside-bottom':
+                return that.width();
+              case 'outside':
+                return function(d, j) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value); };
+              default:
+                return 0;
+            }
+          default:
+            return 0;
+        }
+      })();
+      
+      _labelY = (function() {
+        switch (_baseline) {
+          case 'left':
+          case 'right':
+            _alignmentBaseline = 'middle';
+            return function(d, j) { return that.height() / that.data().length * (j + 1/2); };
+          case 'bottom':
+            switch (Label.location) {
+              case 'inside-bottom':
+                return that.width();
+              case 'outside':
+                return function(d, j) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value); };
+              default:
+                return 0;
+            }
+          case 'top':
+            _alignmentBaseline = 'hanging';
+            switch (Label.location) {
+              case 'inside-bottom':
+                return 0;
+              case 'outside':
+                return function(d, j) { return _scales.y ? _scales.y(d.value) : d.value; };
+              default:
+                return 0;
+            }
+          default:
+            return 0;
+        }
+      })();
     };
     
     // Get / set bar chart baseline
@@ -234,9 +298,45 @@
           .attr('y', _barY)
           .attr('fill', function(d, i) { return _scales.c(i); });
       
+      for (var i = 0; i < _labels.length; i++) {
+        updateLabelVariables(_labels[i]);
+        
+        svg.append('g')
+          .attr('class', 'labels ' + _labels[i].dimension)
+          .selectAll('text')
+          .data(that.data())
+          .enter()
+            .append('text')
+            .attr('class', 'label ' + _labels[i].dimension)
+            .attr('text-anchor', _textAnchor)
+            .attr('alignment-baseline', _alignmentBaseline)
+            .attr('x', _labelX)
+            .attr('y', _labelY)
+            .text(function(d) { return d[_labels[i].dimension]; })
+      }
+      
       that.d3(svg);
       
       return this;
+    };
+    
+    that.label = function(Dimension, Location) {
+      var dimensionIsValid = (function() {
+        return Dimension === 'key' || Dimension === 'value';
+      })();
+      
+      var locationIsValid = (function() {
+        return Location === 'inside-bottom' || Location === 'outside';
+      })();
+      
+      if (dimensionIsValid && locationIsValid) {
+        var labelObject = { dimension: Dimension, location: Location };
+        if (_labels.indexOf(labelObject) == -1) _labels.push(labelObject);
+      } else if (Dimension || Location) {
+        throw 'Undefined dimension or location';
+      }
+      
+      return _labels;
     };
     
     return that;
@@ -251,7 +351,7 @@
     var _innerRadius = 0,
         _outerRadius = 0,
         _position = 0,
-        _scales = { c: that.colorScale() },
+        _scales = { c: that.colorScale() };
     
     var updatePosition = function() {
       return [Math.min(that.height(), that.width()) / 2, Math.min(that.height(), that.width()) / 2];
@@ -359,9 +459,9 @@
   
   d3helper.chart = function getChart(ChartType) {
     switch (ChartType) {
-      case 'bar':   return BarChart();    break;
-      case 'donut': return DonutChart();  break;
-      case 'pie':   return PieChart();    break;
+      case 'bar':   return BarChart();
+      case 'donut': return DonutChart();
+      case 'pie':   return PieChart();
       default: throw 'Unknown chart type';
     }
   };
