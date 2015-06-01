@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
+  <style>
+    div { display: inline-block; }
+  </style>
 </head>
 <body>
   <div id="pie"></div>
+  <div id="donut"></div>
   <script src="d3.v3.min.js"></script>
   <script src="d3-helper.js"></script>
   <script>
@@ -17,10 +21,16 @@
       { key: 'D', value: 20 }
     ];
     
+    var graph = d3helper.graph().width(300).height(300).data(data1);
+    
     var pie = d3helper.chart('pie')
-      .height(300).width(300)
-      .data(data1)
+      .graph(graph)
       .target('#pie')
+      .draw();
+    
+    var donut = d3helper.chart('donut')
+      .graph(graph)
+      .target('#donut')
       .draw();
     
   </script>

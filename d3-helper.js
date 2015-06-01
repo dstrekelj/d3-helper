@@ -1,5 +1,5 @@
 (function(Window) {
-  var d3helper = { version: '0.1.0' };
+  var d3helper = { version: '0.1.1' };
   /*
   var Graph = function Graph() {
     this.WIDTH = 0;
@@ -135,6 +135,9 @@
     return that;
   };
   
+  function BarChart() {
+  };
+  
   /**
    * Pie chart. Root of DonutChart.
    */
@@ -154,6 +157,10 @@
       return Math.min(that.height(), that.width()) / 2;
     };
     
+    var updateInnerRadius = function() {
+      return 0;
+    };
+    
     // Get / set `_scale'
     that.colorScale = function(D3ColorScale) {
       if (D3ColorScale) {
@@ -164,10 +171,10 @@
       return _colorScale;
     };
     
-    that.draw = function(InnerRadius, UpdateInnerRadius) {
+    that.draw = function() {
       if (updatePosition) _position = updatePosition();
       if (updateOuterRadius) _outerRadius = updateOuterRadius();
-      if (updateInnerRadius) InnerRadius
+      if (updateInnerRadius) _innerRadius = updateInnerRadius();
       
       var svg = d3.select(that.target())
         .append('svg')
@@ -175,7 +182,7 @@
         .attr('width', that.width())
         .attr('height', that.height())
 
-      var arc = d3.svg.arc().outerRadius(_outerRadius).innerRadius(InnerRadius ? InnerRadius : 0);
+      var arc = d3.svg.arc().outerRadius(_outerRadius).innerRadius(_innerRadius);
       
       var pie = d3.layout.pie().value(function(d) { return d.value; });
       
@@ -190,6 +197,19 @@
               .attr('fill', function(d, i) { return _colorScale(i); });
       
       return that;
+    };
+    
+    that.innerRadius = function(InnerRadius) {
+      if (typeof InnerRadius === 'number') {
+        _innerRadius = InnerRadius;
+        updateInnerRadius = undefined;
+        return this;
+      } else if (typeof InnerRadius === 'function') {
+        updateInnerRadius = InnerRadius;
+        return this;
+      }
+      
+      return _innerRadius;
     };
     
     // Get / set `_outerRadius`
@@ -223,25 +243,10 @@
     return that;
   };
   
-  /**
-   * Donut chart.
-   */
   function DonutChart() {
-    var that = Chart();
+    var that = PieChart();
     
-    var _innerRadius = ;
-    
-    that.draw(_innerRadius);
-    
-    // Get / set `_innerRadius'
-    that.innerRadius = function(InnerRadius) {
-      if (InnerRadius) {
-        _innerRadius = InnerRadius;
-        return this;
-      } else {
-        return _innerRadius;
-      }
-    };
+    that.innerRadius(function() { return Math.min(that.height(), that.width()) / 4; });
     
     return that;
   };
@@ -252,8 +257,9 @@
   
   d3helper.chart = function getChart(ChartType) {
     switch (ChartType) {
-      case 'pie':   return PieChart();    break;
+      case 'bar':   return BarChart();    break;
       case 'donut': return DonutChart();  break;
+      case 'pie':   return PieChart();    break;
       default: throw 'Unknown chart type';
     }
   };
