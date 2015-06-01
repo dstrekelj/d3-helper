@@ -8,11 +8,12 @@
   function Graph() {
     var that = {};
     
-    var _data =   [],
+    var _d3 =     undefined,
+        _data =   [],
         _height = 640,
         _target = 'body',
-        _width =  480,
-        _d3 =     undefined;
+        _width =  480;
+        
     
     // Get / set the D3.js result of what we did
     that.d3 = function d3(D3) {
@@ -81,7 +82,7 @@
           y: null
         };
     
-    // Get / set `_scale'
+    // Get / set color scale
     that.colorScale = function(D3ColorScale) {
       if (D3ColorScale) {
         _scale.c = D3ColorScale;
@@ -91,6 +92,7 @@
       return _scale.c;
     };
     
+    // Get / set x-axis scale
     that.xScale = function(D3Scale) {
       if (D3Scale) {
         _scale.x = D3Scale;
@@ -100,6 +102,7 @@
       return _scale.x;
     };
     
+    // Get / set y-axis scale
     that.yScale = function(D3Scale) {
       if (D3Scale) {
         _scale.y = D3Scale;
@@ -130,6 +133,9 @@
     return that;
   };
   
+  /**
+   * Bar chart.
+   */
   function BarChart() {
     var that = Chart();
     
@@ -138,9 +144,13 @@
         _barX,
         _barY,
         _baseline = 'bottom',
-        _scales = { x: null, y: null };
+        _scales = { c: that.colorScale(), x: that.xScale(), y: that.yScale() };
     
-    var updateBar = function() {
+    var updateVariables = function() {
+      _scales.c = that.colorScale();
+      _scales.x = that.xScale();
+      _scales.y = that.yScale();
+      
       _barHeight = (function() {
         switch (_baseline) {
           case 'bottom':
@@ -194,6 +204,7 @@
       })();      
     };
     
+    // Get / set bar chart baseline
     that.baseline = function(Baseline) {
       if (Baseline) {
         _baseline = Baseline;
@@ -204,7 +215,7 @@
     };
     
     that.draw = function() {
-      updateBar();
+      updateVariables();
       
       var svg = d3.select(that.target())
         .append('svg')
@@ -221,6 +232,9 @@
           .attr('width', _barWidth)
           .attr('x', _barX)
           .attr('y', _barY)
+          .attr('fill', function(d, i) { return _scales.c(i); });
+      
+      that.d3(svg);
       
       return this;
     };
@@ -234,10 +248,10 @@
   function PieChart() {
     var that = Chart();
     
-    var _colorScale = that.colorScale(),
-        _innerRadius = 0,
+    var _innerRadius = 0,
         _outerRadius = 0,
-        _position = 0;
+        _position = 0,
+        _scales = { c: that.colorScale() },
     
     var updatePosition = function() {
       return [Math.min(that.height(), that.width()) / 2, Math.min(that.height(), that.width()) / 2];
@@ -251,11 +265,15 @@
       return 0;
     };
     
-    that.draw = function() {
-      _colorScale = that.colorScale();
+    var updateVariables = function() {
+      _scales.c = that.colorScale();
       if (updatePosition) _position = updatePosition();
       if (updateOuterRadius) _outerRadius = updateOuterRadius();
       if (updateInnerRadius) _innerRadius = updateInnerRadius();
+    };
+    
+    that.draw = function() {
+      updateVariables();
       
       var svg = d3.select(that.target())
         .append('svg')
@@ -275,11 +293,14 @@
             .attr('transform', 'translate(' + _position + ')')
             .append('path')
               .attr('d', arc)
-              .attr('fill', function(d, i) { return _colorScale(i); });
+              .attr('fill', function(d, i) { return _scales.c(i); });
+      
+      that.d3(svg);
       
       return this;
     };
     
+    // Get / set inner radius
     that.innerRadius = function(InnerRadius) {
       if (typeof InnerRadius === 'number') {
         _innerRadius = InnerRadius;
@@ -293,7 +314,7 @@
       return _innerRadius;
     };
     
-    // Get / set `_outerRadius`
+    // Get / set outer radius
     that.outerRadius = function(OuterRadius) {
       if (typeof OuterRadius === 'number') {
         _outerRadius = OuterRadius;
@@ -307,7 +328,7 @@
       return _outerRadius;
     };
     
-    // Get / set `_position`
+    // Get / set chart position
     that.position = function(Position) {
       if (typeof Position === 'object') {
         _position = Position;

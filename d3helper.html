@@ -41,36 +41,32 @@
     
     var graph = d3helper.graph().width(300).height(300).data(data1);
     
-    var pie = d3helper.chart('pie')
-      .graph(graph)
-      .target('#pie1')
+    var pie = d3helper.chart('pie').graph(graph)
+    
+    pie.target('#pie1').draw();
+    pie.target('#pie2').outerRadius(100).draw();
+    pie.target('#pie3').position([100, 100]).draw();
+    pie.target('#pie4').colorScale(d3.scale.category20b()).draw();
+    
+    var donut = d3helper.chart('donut').graph(graph);
+    
+    donut.target('#donut1').draw();
+    donut.target('#donut2').outerRadius(100).innerRadius(50).draw();
+    donut.target('#donut3').position([100, 100]).draw();
+    donut.target('#donut4').colorScale(d3.scale.category20c()).draw();
+    
+    var bar = d3helper.chart('bar').graph(graph)
+      
+    bar.target('#bar1').draw();
+    bar.target('#bar2')
+      .baseline('left')
+      .xScale(d3.scale.linear().domain([0, 100]).range([0, graph.height()]))
       .draw();
-    
-    pie.outerRadius(100).target('#pie2').draw();
-    
-    pie.position([100, 100]).target('#pie3').draw();
-    
-    pie.colorScale(d3.scale.category20b()).target('#pie4').draw();
-    
-    var donut = d3helper.chart('donut')
-      .graph(graph)
-      .target('#donut1')
+    bar.target('#bar3')
+      .baseline('top')
+      .yScale(d3.scale.linear().domain([0, 100]).range([0, graph.width()]))
       .draw();
-    
-    donut.outerRadius(100).innerRadius(50).target('#donut2').draw();
-    
-    donut.position([100, 100]).target('#donut3').draw();
-    
-    donut.colorScale(d3.scale.category20c()).target('#donut4').draw();
-    
-    var bar = d3helper.chart('bar')
-      .graph(graph)
-      .target('#bar1')
-      .draw();
-    
-    bar.baseline('left').target('#bar2').draw();
-    bar.baseline('top').target('#bar3').draw();
-    bar.baseline('right').target('#bar4').draw();
+    bar.target('#bar4').baseline('right').draw();
     
   </script>
 </body>
