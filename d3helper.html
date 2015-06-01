@@ -5,21 +5,28 @@
   <title>Document</title>
   <style>
     svg { background: #eee; }
-    div.column { display: inline-block; }
+    div.row { display: block; }
+    div.row div { display: inline-block; }
   </style>
 </head>
 <body>
-  <div class="column">
+  <div class="row">
     <div id="pie1"></div>
     <div id="pie2"></div>
+    <div id="pie3"></div>
+    <div id="pie4"></div>
   </div>
-  <div class="column">
+  <div class="row">
     <div id="donut1"></div>
     <div id="donut2"></div>
     <div id="donut3"></div>
+    <div id="donut4"></div>
   </div>
-  <div class="column">
-    <div id="bar"></div>
+  <div class="row">
+    <div id="bar1"></div>
+    <div id="bar2"></div>
+    <div id="bar3"></div>
+    <div id="bar4"></div>
   </div>
   <script src="d3.v3.min.js"></script>
   <script src="d3-helper.js"></script>
@@ -39,21 +46,32 @@
       .target('#pie1')
       .draw();
     
-    pie.outerRadius(100).position([100, 100]).target('#pie2').draw();
+    pie.outerRadius(100).target('#pie2').draw();
+    
+    pie.position([100, 100]).target('#pie3').draw();
+    
+    pie.colorScale(d3.scale.category20b()).target('#pie4').draw();
     
     var donut = d3helper.chart('donut')
       .graph(graph)
       .target('#donut1')
       .draw();
     
-    donut.outerRadius(100).innerRadius(50).position([100, 100]).target('#donut2').draw();
+    donut.outerRadius(100).innerRadius(50).target('#donut2').draw();
     
-   /* 
+    donut.position([100, 100]).target('#donut3').draw();
+    
+    donut.colorScale(d3.scale.category20c()).target('#donut4').draw();
+    
     var bar = d3helper.chart('bar')
       .graph(graph)
-      .target('#bar')
+      .target('#bar1')
       .draw();
-    */
+    
+    bar.baseline('left').target('#bar2').draw();
+    bar.baseline('top').target('#bar3').draw();
+    bar.baseline('right').target('#bar4').draw();
+    
   </script>
 </body>
 </html>

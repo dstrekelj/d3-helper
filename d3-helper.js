@@ -74,7 +74,40 @@
   function Chart() {
     var that = Graph();
     
-    var _graph = {};
+    var _graph = {},
+        _scale = {
+          c: d3.scale.category10(),
+          x: null,
+          y: null
+        };
+    
+    // Get / set `_scale'
+    that.colorScale = function(D3ColorScale) {
+      if (D3ColorScale) {
+        _scale.c = D3ColorScale;
+        return this;
+      }
+      
+      return _scale.c;
+    };
+    
+    that.xScale = function(D3Scale) {
+      if (D3Scale) {
+        _scale.x = D3Scale;
+        return this;
+      }
+      
+      return _scale.x;
+    };
+    
+    that.yScale = function(D3Scale) {
+      if (D3Scale) {
+        _scale.y = D3Scale;
+        return this;
+      }
+      
+      return _scale.y;
+    };
     
     // Get / set Graph object
     that.graph = function(Graph) {
@@ -98,7 +131,101 @@
   };
   
   function BarChart() {
+    var that = Chart();
     
+    var _barHeight,
+        _barWidth,
+        _barX,
+        _barY,
+        _baseline = 'bottom',
+        _scales = { x: null, y: null };
+    
+    var updateBar = function() {
+      _barHeight = (function() {
+        switch (_baseline) {
+          case 'bottom':
+          case 'top':
+            return function(d, i) { return _scales.y ? _scales.y(d.value) : d.value; };
+            break;
+          default:
+            return that.height() / that.data().length;
+        }
+      })();
+      
+      _barWidth = (function() {
+        switch (_baseline) {
+          case 'left':
+          case 'right':
+            return function(d, i) { return _scales.x ? _scales.x(d.value) : d.value; };
+            break;
+          default:
+            return that.width() / that.data().length;
+        }
+      })();
+      
+      _barX = (function() {
+        switch (_baseline) {
+          case 'bottom':
+          case 'top':
+            return function(d, i) { return that.width() / that.data().length * i; };
+            break;
+          case 'right':
+            return function(d, i) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value); };
+            break;
+          case 'left':
+          default:
+            return 0;
+        }
+      })();
+
+      _barY = (function() {
+        switch (_baseline) {
+          case 'left':
+          case 'right':
+            return function(d, i) { return that.height() / that.data().length * i; };
+            break;
+          case 'bottom':
+            return function(d, i) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value); };
+            break;
+          case 'top':
+          default:
+            return 0;
+        }
+      })();      
+    };
+    
+    that.baseline = function(Baseline) {
+      if (Baseline) {
+        _baseline = Baseline;
+        return this;
+      }
+      
+      return _baseline;
+    };
+    
+    that.draw = function() {
+      updateBar();
+      
+      var svg = d3.select(that.target())
+        .append('svg')
+        .attr('class', 'barchart')
+        .attr('width', that.width())
+        .attr('height', that.height());
+      
+      svg.selectAll('rect')
+        .data(that.data())
+        .enter()
+          .append('rect')
+          .attr('class', 'bar')
+          .attr('height', _barHeight)
+          .attr('width', _barWidth)
+          .attr('x', _barX)
+          .attr('y', _barY)
+      
+      return this;
+    };
+    
+    return that;
   };
   
   /**
@@ -107,10 +234,10 @@
   function PieChart() {
     var that = Chart();
     
-    var _position = 0,
-        _outerRadius = 0,
+    var _colorScale = that.colorScale(),
         _innerRadius = 0,
-        _colorScale = d3.scale.category10();
+        _outerRadius = 0,
+        _position = 0;
     
     var updatePosition = function() {
       return [Math.min(that.height(), that.width()) / 2, Math.min(that.height(), that.width()) / 2];
@@ -124,17 +251,8 @@
       return 0;
     };
     
-    // Get / set `_scale'
-    that.colorScale = function(D3ColorScale) {
-      if (D3ColorScale) {
-        _colorScale = D3ColorScale;
-        return this;
-      }
-      
-      return _colorScale;
-    };
-    
     that.draw = function() {
+      _colorScale = that.colorScale();
       if (updatePosition) _position = updatePosition();
       if (updateOuterRadius) _outerRadius = updateOuterRadius();
       if (updateInnerRadius) _innerRadius = updateInnerRadius();
@@ -143,7 +261,7 @@
         .append('svg')
         .attr('class', 'piechart')
         .attr('width', that.width())
-        .attr('height', that.height())
+        .attr('height', that.height());
 
       var arc = d3.svg.arc().outerRadius(_outerRadius).innerRadius(_innerRadius);
       
@@ -159,7 +277,7 @@
               .attr('d', arc)
               .attr('fill', function(d, i) { return _colorScale(i); });
       
-      return that;
+      return this;
     };
     
     that.innerRadius = function(InnerRadius) {
