@@ -1,43 +1,5 @@
 (function(Window) {
   var d3helper = { version: '0.1.2' };
-  /*
-  var Graph = function Graph() {
-    this.WIDTH = 0;
-    this.HEIGHT = 0;
-    this.DATA = undefined;
-  };
-  
-  Graph.prototype.width = function setWidth(Width) {
-    this.width = Width;
-    return this;
-  };
-  
-  Graph.prototype.height = function setHeight(Height) {
-    this.height = Height;
-    return this;
-  };
-  
-  Graph.prototype.data = function setData(Data) {
-    this.data = Data;
-    return this;
-  };
-  
-  var PieChart = function PieChart() {
-    Graph.call(this);
-    
-    this.innerRadius = 0;
-    this.outerRadius = 0;
-    this.SCALE = { };
-  };
-  
-  PieChart.prototype.scale = function setScale(Axis, Scale) {
-    this.scale.Axis = Scale;
-    return this;
-  };
-  
-  //PieChart.prototype = Object.create(Graph.prototype);
-  //PieChart.prototype.constructor = Graph;
-  */
   
   /**
    * Graph base. Defines width, height, target parent, as well as 
