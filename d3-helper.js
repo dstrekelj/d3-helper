@@ -1,5 +1,5 @@
 (function(Window) {
-  var d3helper = { version: '0.1.1' };
+  var d3helper = { version: '0.1.2' };
   /*
   var Graph = function Graph() {
     this.WIDTH = 0;
@@ -136,6 +136,7 @@
   };
   
   function BarChart() {
+    
   };
   
   /**
@@ -228,7 +229,7 @@
     
     // Get / set `_position`
     that.position = function(Position) {
-      if (typeof Position === 'array') {
+      if (typeof Position === 'object') {
         _position = Position;
         updatePosition = undefined;
         return this;

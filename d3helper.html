@@ -4,12 +4,23 @@
   <meta charset="UTF-8">
   <title>Document</title>
   <style>
-    div { display: inline-block; }
+    svg { background: #eee; }
+    div.column { display: inline-block; }
   </style>
 </head>
 <body>
-  <div id="pie"></div>
-  <div id="donut"></div>
+  <div class="column">
+    <div id="pie1"></div>
+    <div id="pie2"></div>
+  </div>
+  <div class="column">
+    <div id="donut1"></div>
+    <div id="donut2"></div>
+    <div id="donut3"></div>
+  </div>
+  <div class="column">
+    <div id="bar"></div>
+  </div>
   <script src="d3.v3.min.js"></script>
   <script src="d3-helper.js"></script>
   <script>
@@ -25,14 +36,24 @@
     
     var pie = d3helper.chart('pie')
       .graph(graph)
-      .target('#pie')
+      .target('#pie1')
       .draw();
+    
+    pie.outerRadius(100).position([100, 100]).target('#pie2').draw();
     
     var donut = d3helper.chart('donut')
       .graph(graph)
-      .target('#donut')
+      .target('#donut1')
       .draw();
     
+    donut.outerRadius(100).innerRadius(50).position([100, 100]).target('#donut2').draw();
+    
+   /* 
+    var bar = d3helper.chart('bar')
+      .graph(graph)
+      .target('#bar')
+      .draw();
+    */
   </script>
 </body>
 </html>
