@@ -1,5 +1,5 @@
 (function(Window) {
-  var d3helper = { version: '0.1.2' };
+  var d3helper = { version: '0.2.1-a' };
   
   /**
    * Graph base. Defines width, height, target parent, as well as 
