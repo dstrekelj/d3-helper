@@ -27,17 +27,16 @@
     <div id="bar2"></div>
     <div id="bar3"></div>
     <div id="bar4"></div>
-    <div id="bar5"></div>
   </div>
   <script src="d3.v3.min.js"></script>
   <script src="d3-helper.js"></script>
   <script>
     
     var data1 = [
-      { key: 'A', value: 80 },
-      { key: 'B', value: 30 },
-      { key: 'C', value: 60 },
-      { key: 'D', value: 20 }
+      { key: 'Ana', value: 80 },
+      { key: 'Bero', value: 30 },
+      { key: 'Cule', value: 60 },
+      { key: 'Dara', value: 20 }
     ];
     
     var graph = d3helper.graph().width(300).height(300).data(data1);
@@ -64,13 +63,13 @@
     bar.target('#bar1').draw();
     bar.target('#bar2')
       .baseline('left')
-      .xScale(d3.scale.linear().domain([0, 100]).range([0, graph.height()]))
+      .xScale(d3.scale.linear().domain([0, 100]).range([0, graph.width()]))
       .draw();
     bar.target('#bar3')
       .baseline('top')
-      .yScale(d3.scale.linear().domain([0, 100]).range([0, graph.width()]))
+      .yScale(d3.scale.linear().domain([0, 100]).range([0, graph.height()]))
       .draw();
-    bar.target('#bar4').baseline('right').draw();
+    bar.target('#bar4').baseline('right').labelPadding(20).draw();
     
   </script>
 </body>

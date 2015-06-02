@@ -60,6 +60,10 @@ Chart is the base object for all charts. It defines general attributes and metho
 
 Accessor. Gets / sets chart color scale. _D3ColorScale_ must be a D3 scale object. A chart's color scale defaults to _d3.scale.category10()_.
 
+~ helper.chart(_ChartType_).**graph**(_Graph_);
+
+Accessor. Gets / sets the base graph object.
+
 ~ helper.chart(_ChartType_).**xScale**(_D3Scale_);
 
 Accessor. Gets / sets chart scale for the horizontal axis. _D3Scale_ must be a D3 scale object. A chart's horizontal scale is undefined by default.
@@ -67,10 +71,6 @@ Accessor. Gets / sets chart scale for the horizontal axis. _D3Scale_ must be a D
 ~ helper.chart(_ChartType_).**yScale**(_D3Scale_);
 
 Accessor. Gets / sets chart scale for the vertical axis. _D3Scale_ must be a D3 scale object. A chart's vertical scale is undefined by default.
-
-~ helper.chart(_ChartType_).**graph**(_Graph_);
-
-Accessor. Gets / sets the base graph object.
 
 ### Bar
 
@@ -92,6 +92,10 @@ Accessor. Gets / sets the position of the bar chart's baseline (the axis from wh
 
 Accessor. Determines whether a data dimension will be labeled on the graph. Supported values for _Dimension_ are "key", and "value". Supported values for _Location_ are "inside-bottom", and "outside".
 
+~ helper.chart('bar').**labelPadding**(_LabelPadding_);
+
+Accessor. Pads all labels by _LabelPadding_ width.
+
 ### Pie
 
 **Data format.** Data is structured as key-value pairs inside an anonymous object. For example:
@@ -112,11 +116,11 @@ Accessor. Gets / sets the D3 color scale that affects a pie segment's fill color
 
 Accessor. Gets / sets pie chart outer radius. Defaults to half of the smaller of the graph's size measures; meaning the pie chart fills the graph along either the width or height (or both) of the graph.
 
-The _OuterRadius_ argument can be either a number or a function
+The _OuterRadius_ argument can be either a number or function. If set to a function, the function is called to update the outer radius value when the chart is drawn.
 
 ~ helper.chart('pie').**position**(_Position_);
 
-Accessor. Gets / sets pie chart position. Defaults to half of the smaller of the graph's size measures; meaning the pie chart is centred either vertically or horizontally (or both) inside the graph. The _Position_ argument must be an [_XOffset_, _YOffset_] array of values.
+Accessor. Gets / sets pie chart position. Defaults to half of the smaller of the graph's size measures; meaning the pie chart 'sticks' to either the top or left side of the graph. The _Position_ argument must be an [_XOffset_, _YOffset_] array of values.
 
 ### Donut
 

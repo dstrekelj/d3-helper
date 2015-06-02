@@ -1,5 +1,5 @@
 (function(Window) {
-  var d3helper = { version: '0.2.1-a' };
+  var d3helper = { version: '0.2.2' };
   
   /**
    * Graph base. Defines width, height, target parent, as well as 
@@ -146,6 +146,7 @@
         _barY,
         _baseline = 'bottom',
         _labels = [],
+        _labelPadding = 10,
         _labelX,
         _labelY,
         _scales = { c: that.colorScale(), x: that.xScale(), y: that.yScale() },
@@ -216,9 +217,9 @@
             _textAnchor = 'start';
             switch (Label.location) {
               case 'inside-bottom':
-                return 0;
+                return _labelPadding;
               case 'outside':
-                return function(d, j) { return _scales.x ? _scales.x(d.value) : d.value; };
+                return function(d, j) { return (_scales.x ? _scales.x(d.value) : d.value) + _labelPadding; };
               default:
                 return 0;
             }
@@ -226,9 +227,9 @@
             _textAnchor = 'end';
             switch (Label.location) {
               case 'inside-bottom':
-                return that.width();
+                return that.width() - _labelPadding;
               case 'outside':
-                return function(d, j) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value); };
+                return function(d, j) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value) - _labelPadding; };
               default:
                 return 0;
             }
@@ -246,9 +247,9 @@
           case 'bottom':
             switch (Label.location) {
               case 'inside-bottom':
-                return that.width();
+                return that.height() - _labelPadding;
               case 'outside':
-                return function(d, j) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value); };
+                return function(d, j) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value) - _labelPadding; };
               default:
                 return 0;
             }
@@ -256,9 +257,9 @@
             _alignmentBaseline = 'hanging';
             switch (Label.location) {
               case 'inside-bottom':
-                return 0;
+                return _labelPadding;
               case 'outside':
-                return function(d, j) { return _scales.y ? _scales.y(d.value) : d.value; };
+                return function(d, j) { return (_scales.y ? _scales.y(d.value) : d.value) + _labelPadding; };
               default:
                 return 0;
             }
@@ -337,6 +338,17 @@
       }
       
       return _labels;
+    };
+    
+    that.labelPadding = function(LabelPadding) {
+      if (typeof LabelPadding === 'number') {
+        _labelPadding = LabelPadding;
+        return this;
+      } else if (LabelPadding) {
+        throw 'Argument must be of type Number';
+      }
+      
+      return _labelPadding;
     };
     
     return that;
