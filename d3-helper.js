@@ -91,6 +91,24 @@
       return _scale.c;
     };
     
+    // Get / set Graph object
+    that.graph = function(Graph) {
+      if (Graph) {
+        that.data(Graph.data());
+        that.height(Graph.height());
+        that.target(Graph.target());
+        that.width(Graph.width());
+        return this;
+      } else {
+        return {
+          data:   that.data(),
+          height: that.height(),
+          target: that.target(),
+          width:  that.width()
+        };
+      }
+    };
+    
     // Get / set x-axis scale
     that.xScale = function(D3Scale) {
       if (D3Scale) {
@@ -109,24 +127,6 @@
       }
       
       return _scale.y;
-    };
-    
-    // Get / set Graph object
-    that.graph = function(Graph) {
-      if (Graph) {
-        that.data(Graph.data());
-        that.height(Graph.height());
-        that.target(Graph.target());
-        that.width(Graph.width());
-        return this;
-      } else {
-        return {
-          data:   that.data(),
-          height: that.height(),
-          target: that.target(),
-          width:  that.width()
-        };
-      }
     };
     
     return that;
@@ -386,11 +386,11 @@
       _alignmentBaseline = (function() {
         switch (Label.location) {
           case 'below':
-            _labelY = _labelSpacing / 2;
+            _labelY = _labels.length > 1 ? _labelSpacing / 2 : 0;
             return 'hanging';
           case 'above':
           default:
-            _labelY = - _labelSpacing / 2;
+            _labelY = - (_labels.length > 1 ? _labelSpacing / 2 : 0);
             return 'alphabetic';
         }
       })();
