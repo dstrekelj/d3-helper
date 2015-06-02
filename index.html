@@ -1,77 +1,97 @@
-<html>
-  <head>
-    <style>
-      div { margin: .1em 0; display: inline-block; }
-      div[id^="b"] { border: 1px solid #4a8a4a; }
-      .barchart { background: #f0f0c0; }
-      .bar { fill: #5aaa5a; }
-      .bar:nth-child(2n) { fill: #4a8a4a; }
-      .label { font-family: sans-serif; }
-      .label.key { fill: white; font-weight: bold; }
-      .arc:nth-child(1) { fill: darkgreen; }
-      .arc:nth-child(2) { fill: teal; }
-      .arc:nth-child(3) { fill: skyblue; }
-      .arc:nth-child(4) { fill: steelblue; }
-    </style>
-  </head>
-  <body>
-    <div>
-      <div id="b1"></div>
-      <div id="b2"></div>
-      <div id="b3"></div>
-      <div id="b4"></div>
-      <div id="b5"></div>
-    </div>
-    <div>
-      <div id="p1"></div>
-      <div id="p2"></div>
-      <div id="p3"></div>
-      <div id="p4"></div>
-    </div>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="helper.js"></script>
-    <script>
-      
-      // The data to visualise
-      var data = [
-        { key: 'Ana', value: 15 },
-        { key: 'Boško', value: 45 },
-        { key: 'Cule', value: 30 },
-        { key: 'Dora', value: 20 }
-      ];
-      
-      // Pass the data, graph width, graph height to helper
-      helper.data(data).width(300).height(300);
-      
-      // Draw bar chart of passed data to #b1 div
-      helper.target('#b1').chart('bar');
-      
-      // Let's scale our data along the y-axis and add labels
-      helper.scale('y', 0, 50).label('key', 'inside-bottom').label('value', 'outside');
-      
-      // Draw the scaled bar chart to #b2. Explicitly define 'bottom' baseline
-      helper.target('#b2').chart('bar', 'bottom');
-      
-      // Let's place the baseline at the top
-      helper.target('#b3').chart('bar', 'top');
-      
-      // Scale the data along the x-axis so we can draw it on its side
-      helper.scale('x', 0, 50);
-      
-      // Baseline to the left
-      helper.target('#b4').chart('bar', 'left');
-      
-      // Baseline to the right
-      helper.target('#b5').chart('bar', 'right');
-      
-      helper.target('#p1').chart('pie');
-      
-      helper.target('#p2').chart('ring');
-      
-      helper.target('#p3').outerRadius(120).chart('pie');
-      
-      helper.target('#p4').innerRadius(40).chart('ring');
-      
-    </script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+    svg { background: #eee; }
+    div.row { display: block; }
+    div.row div { display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <div id="pie1"></div>
+    <div id="pie2"></div>
+    <div id="pie3"></div>
+    <div id="pie4"></div>
+    <div id="pie5"></div>
+    <div id="pie6"></div>
+  </div>
+  <div class="row">
+    <div id="donut1"></div>
+    <div id="donut2"></div>
+    <div id="donut3"></div>
+    <div id="donut4"></div>
+  </div>
+  <div class="row">
+    <div id="bar1"></div>
+    <div id="bar2"></div>
+    <div id="bar3"></div>
+    <div id="bar4"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+  <script src="helper.js"></script>
+  <script>
+    
+    var data1 = [
+      { key: 'Ana', value: 80 },
+      { key: 'Bero', value: 30 },
+      { key: 'Cule', value: 60 },
+      { key: 'Dara', value: 20 }
+    ];
+    
+    var graph = helper.graph().width(300).height(300).data(data1);
+    
+    var pie = helper.chart('pie').graph(graph)
+    // Let's draw a pie chart to an element with 'pie1' ID
+    pie.target('#pie1').draw();
+    // Let's add key and value labels, with keys below values
+    pie.target('#pie2')
+    .label('key', 'below')
+    .label('value', 'above')
+    .draw();
+    // The labels should be offset a bit...
+    pie.target('#pie3')
+    .labelOffset(1.2)
+    .labelSpacing(10)
+    .draw();
+    // Perfect. But the pie radius is a bit too large!
+    pie.target('#pie4')
+    .outerRadius(100)
+    .draw();
+    // It would look cool in the top left corner, I think
+    pie.target('#pie5')
+    .position([100, 100])
+    .draw();
+    // And to finish, let's give the chart a fresh coat of paint
+    pie.target('#pie6')
+    .colorScale(d3.scale.category20c())
+    .draw();
+    
+    var donut = helper.chart('donut').graph(graph);
+    
+    donut.target('#donut1').label('key', 'below').label('value', 'above').labelSpacing(10).draw();
+    donut.target('#donut2').outerRadius(100).innerRadius(50).draw();
+    donut.target('#donut3').position([100, 100]).draw();
+    donut.target('#donut4').colorScale(d3.scale.category20c()).draw();
+    
+    var bar = helper.chart('bar').graph(graph)
+    
+    bar.label('key', 'inside-bottom');
+    bar.label('value', 'outside');
+    
+    bar.target('#bar1').draw();
+    bar.target('#bar2')
+      .baseline('left')
+      .xScale(d3.scale.linear().domain([0, 100]).range([0, graph.width()]))
+      .draw();
+    bar.target('#bar3')
+      .baseline('top')
+      .yScale(d3.scale.linear().domain([0, 100]).range([0, graph.height()]))
+      .draw();
+    bar.target('#bar4').baseline('right').labelPadding(20).draw();
+    
+  </script>
+</body>
 </html>
