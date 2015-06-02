@@ -1,5 +1,5 @@
 (function(Window) {
-  var d3helper = { version: '0.2.3' };
+  var d3helper = { version: '0.2.4' };
   
   /**
    * Graph base. Defines width, height, target parent, as well as 
@@ -363,7 +363,7 @@
     var _innerRadius = 0,
         _labels = [],
         _labelOffset = 1,
-        _labelPadding = 10,
+        _labelSpacing = 0,
         _labelX,
         _labelY,
         _outerRadius = 0,
@@ -386,9 +386,11 @@
       _alignmentBaseline = (function() {
         switch (Label.location) {
           case 'below':
+            _labelY = _labelSpacing / 2;
             return 'hanging';
           case 'above':
           default:
+            _labelY = - _labelSpacing / 2;
             return 'alphabetic';
         }
       })();
@@ -435,27 +437,13 @@
           .attr('transform', function(d) {
             var centroid = arc.centroid(d),
                 centroidX = centroid[0] * _labelOffset,
-                centroidY = centroid[1] * _labelOffset;
+                centroidY = centroid[1] * _labelOffset + _labelY;
             
             return 'translate(' + centroidX + ',' + centroidY + ')';
           })
           .attr('text-anchor', _textAnchor)
           .attr('alignment-baseline', _alignmentBaseline)
           .text(function(d) { return d.data[_labels[i].dimension]; });
-                
-        /*
-        svg.append('g')
-          .attr('class', 'labels ' + _labels[i].dimension)
-          .selectAll('text')
-          .data(pie(that.data()))
-          .enter()
-            .append('text')
-            .attr('class', 'label ' + _labels[i].dimension)
-            .attr('text-anchor', _textAnchor)
-            .attr('alignment-baseline', _alignmentBaseline)
-            .attr('transform', function(d) { d.innerRadius = 0; d.outerRadius = _outerRadius; return 'translate(' + arc.centroid(d) + ')'; })
-            .text(function(d) { return d.data[_labels[i].dimension]; })
-        */
       }
       
       that.d3(svg);
@@ -506,6 +494,17 @@
       }
       
       return _labelOffset;
+    };
+    
+    that.labelSpacing = function(LabelSpacing) {
+      if (typeof LabelSpacing === 'number') {
+        _labelSpacing = LabelSpacing;
+        return this;
+      } else if (LabelSpacing) {
+        throw 'Argument must be of type Number';
+      }
+      
+      return _labelSpacing;
     };
     
     // Get / set outer radius
