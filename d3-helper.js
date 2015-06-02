@@ -1,5 +1,5 @@
 (function(Window) {
-  var d3helper = { version: '0.2.2' };
+  var d3helper = { version: '0.2.3' };
   
   /**
    * Graph base. Defines width, height, target parent, as well as 
@@ -13,7 +13,6 @@
         _height = 640,
         _target = 'body',
         _width =  480;
-        
     
     // Get / set the D3.js result of what we did
     that.d3 = function d3(D3) {
@@ -152,58 +151,6 @@
         _scales = { c: that.colorScale(), x: that.xScale(), y: that.yScale() },
         _textAnchor;
     
-    var updateVariables = function() {
-      _scales.c = that.colorScale();
-      _scales.x = that.xScale();
-      _scales.y = that.yScale();
-      
-      _barHeight = (function() {
-        switch (_baseline) {
-          case 'bottom':
-          case 'top':
-            return function(d, i) { return _scales.y ? _scales.y(d.value) : d.value; };
-          default:
-            return that.height() / that.data().length;
-        }
-      })();
-      
-      _barWidth = (function() {
-        switch (_baseline) {
-          case 'left':
-          case 'right':
-            return function(d, i) { return _scales.x ? _scales.x(d.value) : d.value; };
-          default:
-            return that.width() / that.data().length;
-        }
-      })();
-      
-      _barX = (function() {
-        switch (_baseline) {
-          case 'bottom':
-          case 'top':
-            return function(d, i) { return that.width() / that.data().length * i; };
-          case 'right':
-            return function(d, i) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value); };
-          case 'left':
-          default:
-            return 0;
-        }
-      })();
-
-      _barY = (function() {
-        switch (_baseline) {
-          case 'left':
-          case 'right':
-            return function(d, i) { return that.height() / that.data().length * i; };
-          case 'bottom':
-            return function(d, i) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value); };
-          case 'top':
-          default:
-            return 0;
-        }
-      })();
-    };
-    
     var updateLabelVariables = function(Label) {
       _alignmentBaseline = 'alphabetic';
       _textAnchor = 'middle';
@@ -263,6 +210,58 @@
               default:
                 return 0;
             }
+          default:
+            return 0;
+        }
+      })();
+    };
+    
+    var updateVariables = function() {
+      _scales.c = that.colorScale();
+      _scales.x = that.xScale();
+      _scales.y = that.yScale();
+      
+      _barHeight = (function() {
+        switch (_baseline) {
+          case 'bottom':
+          case 'top':
+            return function(d, i) { return _scales.y ? _scales.y(d.value) : d.value; };
+          default:
+            return that.height() / that.data().length;
+        }
+      })();
+      
+      _barWidth = (function() {
+        switch (_baseline) {
+          case 'left':
+          case 'right':
+            return function(d, i) { return _scales.x ? _scales.x(d.value) : d.value; };
+          default:
+            return that.width() / that.data().length;
+        }
+      })();
+      
+      _barX = (function() {
+        switch (_baseline) {
+          case 'bottom':
+          case 'top':
+            return function(d, i) { return that.width() / that.data().length * i; };
+          case 'right':
+            return function(d, i) { return that.width() - (_scales.x ? _scales.x(d.value) : d.value); };
+          case 'left':
+          default:
+            return 0;
+        }
+      })();
+
+      _barY = (function() {
+        switch (_baseline) {
+          case 'left':
+          case 'right':
+            return function(d, i) { return that.height() / that.data().length * i; };
+          case 'bottom':
+            return function(d, i) { return that.height() - (_scales.y ? _scales.y(d.value) : d.value); };
+          case 'top':
           default:
             return 0;
         }
@@ -333,6 +332,7 @@
       if (dimensionIsValid && locationIsValid) {
         var labelObject = { dimension: Dimension, location: Location };
         if (_labels.indexOf(labelObject) == -1) _labels.push(labelObject);
+        return this;
       } else if (Dimension || Location) {
         throw 'Undefined dimension or location';
       }
@@ -361,6 +361,11 @@
     var that = Chart();
     
     var _innerRadius = 0,
+        _labels = [],
+        _labelOffset = 1,
+        _labelPadding = 10,
+        _labelX,
+        _labelY,
         _outerRadius = 0,
         _position = 0,
         _scales = { c: that.colorScale() };
@@ -375,6 +380,20 @@
     
     var updateInnerRadius = function() {
       return 0;
+    };
+    
+    var updateLabelVariables = function(Label) {
+      _alignmentBaseline = (function() {
+        switch (Label.location) {
+          case 'below':
+            return 'hanging';
+          case 'above':
+          default:
+            return 'alphabetic';
+        }
+      })();
+      
+      _textAnchor = 'middle';
     };
     
     var updateVariables = function() {
@@ -403,9 +422,41 @@
           .append('g')
             .attr('class', 'arc')
             .attr('transform', 'translate(' + _position + ')')
-            .append('path')
-              .attr('d', arc)
-              .attr('fill', function(d, i) { return _scales.c(i); });
+      
+      arcs.append('path')
+        .attr('d', arc)
+        .attr('fill', function(d, i) { return _scales.c(i); });
+      
+      for (var i = 0; i < _labels.length; i++) {
+        updateLabelVariables(_labels[i]);
+        
+        arcs.append('text')
+          .attr('class', 'label ' + _labels[i].dimension)
+          .attr('transform', function(d) {
+            var centroid = arc.centroid(d),
+                centroidX = centroid[0] * _labelOffset,
+                centroidY = centroid[1] * _labelOffset;
+            
+            return 'translate(' + centroidX + ',' + centroidY + ')';
+          })
+          .attr('text-anchor', _textAnchor)
+          .attr('alignment-baseline', _alignmentBaseline)
+          .text(function(d) { return d.data[_labels[i].dimension]; });
+                
+        /*
+        svg.append('g')
+          .attr('class', 'labels ' + _labels[i].dimension)
+          .selectAll('text')
+          .data(pie(that.data()))
+          .enter()
+            .append('text')
+            .attr('class', 'label ' + _labels[i].dimension)
+            .attr('text-anchor', _textAnchor)
+            .attr('alignment-baseline', _alignmentBaseline)
+            .attr('transform', function(d) { d.innerRadius = 0; d.outerRadius = _outerRadius; return 'translate(' + arc.centroid(d) + ')'; })
+            .text(function(d) { return d.data[_labels[i].dimension]; })
+        */
+      }
       
       that.d3(svg);
       
@@ -424,6 +475,37 @@
       }
       
       return _innerRadius;
+    };
+    
+    that.label = function(Dimension, Location) {
+      var dimensionIsValid = (function() {
+        return Dimension === 'key' || Dimension === 'value';
+      })();
+      
+      var locationIsValid = (function() {
+        return Location === 'above' || Location === 'below';
+      })();
+      
+      if (dimensionIsValid && locationIsValid) {
+        var labelObject = { dimension: Dimension, location: Location };
+        if (_labels.indexOf(labelObject) == -1) _labels.push(labelObject);
+        return this;
+      } else if (Dimension || Location) {
+        throw 'Undefined dimension or location';
+      }
+      
+      return _labels;
+    };
+    
+    that.labelOffset = function(LabelOffset) {
+      if (typeof LabelOffset === 'number') {
+        _labelOffset = LabelOffset;
+        return this;
+      } else if (LabelOffset) {
+        throw 'Argument must be of type Number';
+      }
+      
+      return _labelOffset;
     };
     
     // Get / set outer radius
